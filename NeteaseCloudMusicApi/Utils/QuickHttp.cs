@@ -33,7 +33,7 @@ namespace NeteaseCloudMusicApi.Utils {
 		private static readonly ConstructorInfo CookieParser_ConstructorInfo = CookieParser_Type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).First(t => t.GetParameters().SingleOrDefault()?.ParameterType == typeof(string));
 		private static readonly MethodInfo CookieParser_Get_MethodInfo = CookieParser_Type.GetMethod("Get", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
 		private static readonly MethodInfo CookieParser_EndofHeader_MethodInfo = CookieParser_Type.GetMethod("EndofHeader", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
-#if DEBUG
+#if FALSE
 		private static readonly FieldInfo HttpMessageInvoker_Handler_FieldInfo = typeof(HttpMessageInvoker).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).First(t => t.FieldType == typeof(HttpMessageHandler));
 #endif
 
@@ -104,12 +104,12 @@ namespace NeteaseCloudMusicApi.Utils {
 				throw new ArgumentOutOfRangeException(nameof(content), $"For '{content}', only the following types are supported: {ContentConverters.SupportedTypesString}");
 			if (!(headers is null) && !HeaderConverters.TryConvert(request, headers))
 				throw new ArgumentOutOfRangeException(nameof(headers), $"For '{headers}', only the following types are supported: {HeaderConverters.SupportedTypesString}");
-#if DEBUG
+#if FALSE
 			if (!(headers is null) && HttpMessageInvoker_Handler_FieldInfo.GetValue(client) is HttpClientHandler handler && handler.UseCookies) {
 				using var r = new HttpRequestMessage { Content = new StringContent(string.Empty) };
 				HeaderConverters.TryConvert(r, headers);
 				if (r.Headers.Contains("Cookie"))
-					System.Diagnostics.Debug.Assert(false, "Don't set cookies by headers if HttpClientHandler.UseCookies is true.");
+					System.Diagnostics.FALSE.Assert(false, "Don't set cookies by headers if HttpClientHandler.UseCookies is true.");
 			}
 #endif
 			return await client.SendAsync(request, cancellationToken);
