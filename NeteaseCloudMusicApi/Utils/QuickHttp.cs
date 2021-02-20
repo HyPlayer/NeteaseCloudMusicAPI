@@ -33,7 +33,7 @@ namespace NeteaseCloudMusicApi.Utils {
 		private static readonly ConstructorInfo CookieParser_ConstructorInfo = CookieParser_Type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).First(t => t.GetParameters().SingleOrDefault()?.ParameterType == typeof(string));
 		private static readonly MethodInfo CookieParser_Get_MethodInfo = CookieParser_Type.GetMethod("Get", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
 		private static readonly MethodInfo CookieParser_EndofHeader_MethodInfo = CookieParser_Type.GetMethod("EndofHeader", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
-#if FALSE
+#if DEBUG
 		private static readonly FieldInfo HttpMessageInvoker_Handler_FieldInfo = typeof(HttpMessageInvoker).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).First(t => t.FieldType == typeof(HttpMessageHandler));
 #endif
 
@@ -60,12 +60,27 @@ namespace NeteaseCloudMusicApi.Utils {
 #endif
 		}
 
+		public static CookieCollection ParseCookies(IEnumerable<string> cookieHeaders) {
+			if (cookieHeaders is null)
+				return new CookieCollection();
+
+			var cookies = new CookieCollection();
+			foreach (string cookieHeader in cookieHeaders)
+				ParseCookies(cookies, cookieHeader);
+			return cookies;
+		}
+
 		public static CookieCollection ParseCookies(string cookieHeader) {
 			if (string.IsNullOrEmpty(cookieHeader))
 				return new CookieCollection();
 
-			object parser = CookieParser_ConstructorInfo.Invoke(new object[] { cookieHeader });
 			var cookies = new CookieCollection();
+			ParseCookies(cookies, cookieHeader);
+			return cookies;
+		}
+
+		private static void ParseCookies(CookieCollection cookies, string cookieHeader) {
+			object parser = CookieParser_ConstructorInfo.Invoke(new object[] { cookieHeader });
 			while (true) {
 				var cookie = (Cookie)CookieParser_Get_MethodInfo.Invoke(parser, null);
 				if (cookie is null && (bool)CookieParser_EndofHeader_MethodInfo.Invoke(parser, null))
@@ -73,12 +88,11 @@ namespace NeteaseCloudMusicApi.Utils {
 
 				cookies.Add(cookie);
 			}
-			return cookies;
 		}
 
 		public static string ToCookieHeader(CookieCollection cookies) {
-			if (cookies is null)
-				throw new ArgumentNullException(nameof(cookies));
+			if (cookies is null || cookies.Count == 0)
+				return string.Empty;
 
 #if DotNetCore30Plus
 			return string.Join("; ", cookies.Select(t => t.Name + "=" + t.Value));
@@ -104,12 +118,12 @@ namespace NeteaseCloudMusicApi.Utils {
 				throw new ArgumentOutOfRangeException(nameof(content), $"For '{content}', only the following types are supported: {ContentConverters.SupportedTypesString}");
 			if (!(headers is null) && !HeaderConverters.TryConvert(request, headers))
 				throw new ArgumentOutOfRangeException(nameof(headers), $"For '{headers}', only the following types are supported: {HeaderConverters.SupportedTypesString}");
-#if FALSE
+#if DEBUG
 			if (!(headers is null) && HttpMessageInvoker_Handler_FieldInfo.GetValue(client) is HttpClientHandler handler && handler.UseCookies) {
 				using var r = new HttpRequestMessage { Content = new StringContent(string.Empty) };
 				HeaderConverters.TryConvert(r, headers);
 				if (r.Headers.Contains("Cookie"))
-					System.Diagnostics.FALSE.Assert(false, "Don't set cookies by headers if HttpClientHandler.UseCookies is true.");
+					System.Diagnostics.Debug.Assert(false, "Don't set cookies by headers if HttpClientHandler.UseCookies is true.");
 			}
 #endif
 			return await client.SendAsync(request, cancellationToken);
@@ -218,15 +232,15 @@ namespace NeteaseCloudMusicApi.Utils {
 						content.Headers.Remove("Content-Type");
 					// When we create a HttpContent, it will automatically set a Content-Type. We should remove it first otherwise header parser will throw an exception.
 					if (value is string s)
-						content.Headers.Add(name, s);
+						content.Headers.TryAddWithoutValidation(name, s);
 					else
-						content.Headers.Add(name, (IEnumerable<string>)value);
+						content.Headers.TryAddWithoutValidation(name, (IEnumerable<string>)value);
 				}
 				else {
 					if (value is string s)
-						request.Headers.Add(name, s);
+						request.Headers.TryAddWithoutValidation(name, s);
 					else
-						request.Headers.Add(name, (IEnumerable<string>)value);
+						request.Headers.TryAddWithoutValidation(name, (IEnumerable<string>)value);
 				}
 			}
 		}
