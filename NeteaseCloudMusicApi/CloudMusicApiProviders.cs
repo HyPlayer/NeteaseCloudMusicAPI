@@ -749,7 +749,14 @@ namespace NeteaseCloudMusicApi {
 		/// </summary>
 		public static readonly CloudMusicApiProvider Login = new CloudMusicApiProvider("/login", HttpMethod.Post, "https://music.163.com/weapi/login", new ParameterInfo[] {
 			new ParameterInfo("username") { KeyForwarding = "email" },
-			new ParameterInfo("password") { Transformer = t => t.ToString().ToByteArrayUtf8().ComputeMd5().ToHexStringLower() },
+			new ParameterInfo("password",ParameterType.Custom) { CustomHandler = q => {
+					if (!q.ContainsKey("md5_password") || q.ContainsKey("password")) {
+						return q["password"].ToString().ToByteArrayUtf8().ComputeMd5().ToHexStringLower();
+					}
+
+					return q["md5_password"];
+				}
+			},
 			new ParameterInfo("rememberLogin", ParameterType.Constant, true),
 		}, BuildOptions("weapi", new Cookie[] { new Cookie("os", "pc") }, "pc"));
 
@@ -759,7 +766,14 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider LoginCellphone = new CloudMusicApiProvider("/login/cellphone", HttpMethod.Post, "https://music.163.com/weapi/login/cellphone", new ParameterInfo[] {
 			new ParameterInfo("phone"),
 			new ParameterInfo("countrycode", ParameterType.Optional, string.Empty),
-			new ParameterInfo("password") { Transformer = t => t.ToString().ToByteArrayUtf8().ComputeMd5().ToHexStringLower() },
+			new ParameterInfo("password",ParameterType.Custom) { CustomHandler = q => {
+					if (!q.ContainsKey("md5_password") || q.ContainsKey("password")) {
+						return q["password"].ToString().ToByteArrayUtf8().ComputeMd5().ToHexStringLower();
+					}
+
+					return q["md5_password"];
+				}
+			},
 			new ParameterInfo("rememberLogin", ParameterType.Constant, true)
 		}, BuildOptions("weapi", new Cookie[] { new Cookie("os", "pc") }, "pc"));
 
