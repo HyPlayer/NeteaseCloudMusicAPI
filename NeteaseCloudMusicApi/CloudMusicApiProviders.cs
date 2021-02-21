@@ -1793,7 +1793,7 @@ namespace NeteaseCloudMusicApi {
 		}
 
 		private static object JsonArrayTransformer(object value) {
-			return "[" + value is string s ? s.Replace(" ", string.Empty) : value + "]";
+			return "[" + (value is string s ? s.Replace(" ", string.Empty) : value) + "]";
 		}
 
 		private static string JsonArrayTransformer2(object value) {
