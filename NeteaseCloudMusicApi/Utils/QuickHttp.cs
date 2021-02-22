@@ -29,14 +29,6 @@ namespace NeteaseCloudMusicApi.Utils {
 	/// <see cref="HttpClient"/> is fully rewrited in .NET Core, so many behaviors are different with <see cref="HttpClient"/> in .NET Framework.
 	/// </remarks>
 	internal static class QuickHttp {
-		private static readonly Type CookieParser_Type = typeof(Cookie).Module.GetType("System.Net.CookieParser");
-		private static readonly ConstructorInfo CookieParser_ConstructorInfo = CookieParser_Type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).First(t => t.GetParameters().SingleOrDefault()?.ParameterType == typeof(string));
-		private static readonly MethodInfo CookieParser_Get_MethodInfo = CookieParser_Type.GetMethod("Get", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
-		private static readonly MethodInfo CookieParser_EndofHeader_MethodInfo = CookieParser_Type.GetMethod("EndofHeader", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null);
-#if DEBUG
-		private static readonly FieldInfo HttpMessageInvoker_Handler_FieldInfo = typeof(HttpMessageInvoker).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).First(t => t.FieldType == typeof(HttpMessageHandler));
-#endif
-
 		public static async Task<byte[]> SendAsync(object url, object method, object headers = null, object content = null, bool ensureSuccessStatusCode = true, Out<HttpStatusCode> statusCode = null, Out<CookieCollection> setCookie = null, CancellationToken cancellationToken = default) {
 			using var handler = new HttpClientHandler {
 				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
@@ -80,13 +72,43 @@ namespace NeteaseCloudMusicApi.Utils {
 		}
 
 		private static void ParseCookies(CookieCollection cookies, string cookieHeader) {
-			object parser = CookieParser_ConstructorInfo.Invoke(new object[] { cookieHeader });
-			while (true) {
-				var cookie = (Cookie)CookieParser_Get_MethodInfo.Invoke(parser, null);
-				if (cookie is null && (bool)CookieParser_EndofHeader_MethodInfo.Invoke(parser, null))
-					break;
-
+			try {
+				var cookie = new Cookie();
+				var CookieDic = new Dictionary<string, string>();
+				var arr1 = cookieHeader.Split(';').ToList();
+				var arr2 = arr1[0].Trim().Split('=');
+				cookie.Name = arr2[0];
+				cookie.Value = arr2[1];
+				arr1.RemoveAt(0);
+				foreach (string cookiediac in arr1) {
+					try {
+						string[] cookiesetarr = cookiediac.Trim().Split('=');
+						switch (cookiesetarr[0].Trim().ToLower()) {
+						case "expires":
+							cookie.Expires = DateTime.Parse(cookiesetarr[1].Trim());
+							break;
+						case "max-age":
+							cookie.Expires = DateTime.Now.AddSeconds(int.Parse(cookiesetarr[1]));
+							break;
+						case "domain":
+							cookie.Domain = cookiesetarr[1].Trim();
+							break;
+						case "path":
+							cookie.Path = cookiesetarr[1].Trim().Replace("%x2F", "/");
+							break;
+						case "secure":
+							cookie.Secure = cookiesetarr[1].Trim().ToLower() == "true";
+							break;
+						}
+					}
+					catch {
+						continue;
+					}
+				}
 				cookies.Add(cookie);
+			}
+			catch (Exception) {
+
 			}
 		}
 
@@ -118,14 +140,6 @@ namespace NeteaseCloudMusicApi.Utils {
 				throw new ArgumentOutOfRangeException(nameof(content), $"For '{content}', only the following types are supported: {ContentConverters.SupportedTypesString}");
 			if (!(headers is null) && !HeaderConverters.TryConvert(request, headers))
 				throw new ArgumentOutOfRangeException(nameof(headers), $"For '{headers}', only the following types are supported: {HeaderConverters.SupportedTypesString}");
-#if DEBUG
-			if (!(headers is null) && HttpMessageInvoker_Handler_FieldInfo.GetValue(client) is HttpClientHandler handler && handler.UseCookies) {
-				using var r = new HttpRequestMessage { Content = new StringContent(string.Empty) };
-				HeaderConverters.TryConvert(r, headers);
-				if (r.Headers.Contains("Cookie"))
-					System.Diagnostics.Debug.Assert(false, "Don't set cookies by headers if HttpClientHandler.UseCookies is true.");
-			}
-#endif
 			return await client.SendAsync(request, cancellationToken);
 		}
 
