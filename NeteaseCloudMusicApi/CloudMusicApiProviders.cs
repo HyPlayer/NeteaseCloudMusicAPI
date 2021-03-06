@@ -732,10 +732,12 @@ namespace NeteaseCloudMusicApi {
 		/// <summary>
 		/// 喜欢音乐
 		/// </summary>
-		public static readonly CloudMusicApiProvider Like = new CloudMusicApiProvider("/like", HttpMethod.Post, q => $"https://music.163.com/weapi/radio/like?alg={q.GetValueOrDefault("alg", "itembased")}&trackId={q["id"]}&time={q.GetValueOrDefault("time", 25)}", new ParameterInfo[] {
+		public static readonly CloudMusicApiProvider Like = new CloudMusicApiProvider("/like", HttpMethod.Post, "https://music.163.com/api/radio/like", new ParameterInfo[] {
+			new ParameterInfo("alg",ParameterType.Constant,"itembased"),
 			new ParameterInfo("trackId") { KeyForwarding = "id" },
-			new ParameterInfo("like")
-		}, BuildOptions("weapi"));
+			new ParameterInfo("like"),
+			new ParameterInfo("time",ParameterType.Constant,"3")
+		}, BuildOptions("weapi",new Cookie[]{new Cookie("os","pc"),new Cookie("appver", "2.7.1.198277") }));
 
 		/// <summary>
 		/// 喜欢音乐列表
