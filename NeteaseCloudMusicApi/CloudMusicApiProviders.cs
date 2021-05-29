@@ -406,16 +406,16 @@ namespace NeteaseCloudMusicApi {
 		}, BuildOptions("weapi", new Cookie[] { new Cookie("os", "pc") }));
 
 		/// <summary>
-		/// 评论
+		/// 新版评论
 		/// </summary>
 		public static readonly CloudMusicApiProvider CommentNew = new CloudMusicApiProvider("/comment/new", HttpMethod.Post, "https://music.163.com/api/v2/resource/comments", new ParameterInfo[] {
 			new ParameterInfo("threadId",ParameterType.Custom,null) { CustomHandler = q => CommentTypeTransformer(q["type"]).ToString()+q["id"].ToString() },
 			new ParameterInfo("cursor",ParameterType.Custom,null){ CustomHandler = q => q["sortType"].ToString()== "3" ? (q.GetValueOrDefault("cursor",0)) : ((int.Parse(q["pageNo"].ToString()) - 1) * int.Parse(q["pageSize"].ToString())).ToString()},//这边三目表达式用了很多,然而int转码可能会报错 毕竟js也会报错
-			new ParameterInfo("pageNo",ParameterType.Optional,1){ KeyForwarding="page"},
+			new ParameterInfo("pageNo",ParameterType.Optional,1),
 			new ParameterInfo("pageSize",ParameterType.Optional,20),
 			new ParameterInfo("showInner",ParameterType.Optional,true),
 			new ParameterInfo("sortType",ParameterType.Optional,1),//1:按推荐排序,2:按热度排序,3:按时间排序
-		}, BuildOptions("eapi", new Cookie[] { new Cookie("os", "pc") }));
+		}, BuildOptions("eapi", new Cookie[] { new Cookie("os", "pc") },null, "/api/v2/resource/comments"));
 
 		/// <summary>
 		/// 歌单评论
@@ -745,6 +745,11 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider Likelist = new CloudMusicApiProvider("/likelist", HttpMethod.Post, "https://music.163.com/weapi/song/like/get", new ParameterInfo[] {
 			new ParameterInfo("uid")
 		}, BuildOptions("weapi"));
+
+		/// <summary>
+		/// 一起听状态
+		/// </summary>
+		public static readonly CloudMusicApiProvider ListentogetherStatus = new CloudMusicApiProvider("/listen/together/status", HttpMethod.Post, "https://music.163.com/api/listen/together/status/get", Array.Empty<ParameterInfo>(), BuildOptions("weapi"));
 
 		/// <summary>
 		/// 邮箱登录
