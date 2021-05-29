@@ -121,7 +121,7 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider ArtistDesc = new CloudMusicApiProvider("/artist/desc", HttpMethod.Post, "https://music.163.com/weapi/artist/introduction", new ParameterInfo[] {
 			new ParameterInfo("id")
 		}, BuildOptions("weapi"));
-		
+
 		/// <summary>
 		/// 歌手详细信息
 		/// </summary>
@@ -1124,7 +1124,7 @@ namespace NeteaseCloudMusicApi {
 			new ParameterInfo("op"),
 			new ParameterInfo("pid"),
 			new ParameterInfo("imme",ParameterType.Constant,true),
-			new ParameterInfo("trackIds") { Transformer = JsonArrayTransformer }
+			new ParameterInfo("trackIds") { KeyForwarding = "tracks",Transformer = JsonArrayTransformer }
 		}, BuildOptions("weapi"));
 
 		/// <summary>
