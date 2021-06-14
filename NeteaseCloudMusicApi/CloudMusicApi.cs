@@ -85,8 +85,8 @@ namespace NeteaseCloudMusicApi {
 				return HandleCheckMusicAsync(queries);
 			else if (provider == CloudMusicApiProviders.Login)
 				return HandleLoginAsync(queries);
-			else if (provider == CloudMusicApiProviders.LoginStatus)
-				return HandleLoginStatusAsync();
+			// else if (provider == CloudMusicApiProviders.LoginStatus)
+			// 	return HandleLoginStatusAsync();
 			else if (provider == CloudMusicApiProviders.RelatedPlaylist)
 				return HandleRelatedPlaylistAsync(queries);
 			return RequestAsync(provider.Method, provider.Url(queries), provider.Data(queries), provider.Options);
