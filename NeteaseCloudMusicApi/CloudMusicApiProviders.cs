@@ -2333,6 +2333,7 @@ namespace NeteaseCloudMusicApi {
 			case "4": return "A_DJ_1_"; // 电台
 			case "5": return "R_VI_62_"; // 视频
 			case "6": return "A_EV_2_"; // 动态
+			case "7": return "R_MLOG_1001_"; //MLog
 			default: throw new ArgumentOutOfRangeException(nameof(type));
 			}
 		}
