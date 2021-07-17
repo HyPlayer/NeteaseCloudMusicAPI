@@ -990,6 +990,25 @@ namespace NeteaseCloudMusicApi {
 			}, BuildOptions("linuxapi", new[] {new Cookie("os", "pc")}));
 
 
+		public static readonly CloudMusicApiProvider MlogRcmdFeedList = new CloudMusicApiProvider(
+			"/mlog/rcmd/feed/list",
+			HttpMethod.Post,
+			"https://interface.music.163.com/eapi/mlog/rcmd/feed/list",
+			new [] {
+				new ParameterInfo("id",ParameterType.Required),
+				new ParameterInfo("type",ParameterType.Constant,2),
+				new ParameterInfo("rcmdType",ParameterType.Constant,20),
+				new ParameterInfo("limit",ParameterType.Optional,10),
+				new ParameterInfo("extInfo",ParameterType.Custom) {
+					CustomHandler = (objects => {
+						if (objects.ContainsKey("songid"))
+							return "{\"songId\":\"" + objects["songid"]+"\"}";
+						return "";
+					})
+				}
+			},BuildOptions("eapi",null,null,"/api/mlog/rcmd/feed/list")
+			);
+
 		/// <summary>
 		/// 将mlog id转为视频id
 		/// </summary>
