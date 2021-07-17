@@ -1021,12 +1021,14 @@ namespace NeteaseCloudMusicApi {
 		/// 获取mlog播放地址
 		/// </summary>
 		public static readonly CloudMusicApiProvider MlogUrl = new CloudMusicApiProvider("/mlog/url", HttpMethod.Post,
-			"https://music.163.com/weapi/mlog/detail/v1",
+			"https://interface3.music.163.com/eapi/mlog/video/url",
 			new[] {
-				new ParameterInfo("id"),
+				new ParameterInfo("mlogIds",ParameterType.Custom){ CustomHandler = (objects => "[\""+objects["id"]+"\"]") , KeyForwarding = "id"},
+				new ParameterInfo("scene",ParameterType.Constant,0),
 				new ParameterInfo("resolution", ParameterType.Optional, "1080") {KeyForwarding = "res"},
-				new ParameterInfo("type", ParameterType.Constant, 1)
-			}, BuildOptions("weapi"));
+				new ParameterInfo("type", ParameterType.Constant, 1),
+				new ParameterInfo("netstate",ParameterType.Constant,1)
+			}, BuildOptions("eapi",null,null,"/api/mlog/video/url"));
 
 		/// <summary>
 		/// 通知 - 评论
