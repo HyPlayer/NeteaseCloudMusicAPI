@@ -141,7 +141,7 @@ namespace NeteaseCloudMusicApi {
 			var provider = CloudMusicApiProviders.Login;
 			var (isOk, json) = await RequestAsync(provider.Method, provider.Url(queries), provider.Data(queries), provider.Options);
 			if (!isOk)
-				return (false, null);
+				return (false, json);
 			if ((int?)json["code"] == 502) {
 				json = new JObject {
 					["msg"] = "账号或密码错误",
