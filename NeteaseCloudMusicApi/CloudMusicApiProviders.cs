@@ -39,6 +39,16 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider RelatedPlaylist = new CloudMusicApiProvider("/related/playlist");
 
 		/// <summary>
+		/// 云盘
+		/// </summary>
+		public static readonly CloudMusicApiProvider UserCloud = new CloudMusicApiProvider("/user/cloud",
+			HttpMethod.Post, "https://music.163.com/api/v1/cloud/get",
+			new[] {
+				new ParameterInfo("limit", ParameterType.Optional, 30),
+				new ParameterInfo("offset", ParameterType.Optional, 0)
+			}, BuildOptions("weapi"));
+
+		/// <summary>
 		/// 邮箱登录
 		/// </summary>
 		public static readonly CloudMusicApiProvider Login = new CloudMusicApiProvider("/login", HttpMethod.Post,
