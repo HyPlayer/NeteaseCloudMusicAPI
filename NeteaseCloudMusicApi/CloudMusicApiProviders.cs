@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -593,6 +594,51 @@ namespace NeteaseCloudMusicApi {
 				},
 				new ParameterInfo("ids") {Transformer = JsonArrayTransformer}
 			}, BuildOptions("weapi"));
+
+
+		public static readonly CloudMusicApiProvider CloudPub = new CloudMusicApiProvider("/cloud/pub", HttpMethod.Post,
+			"https://interface.music.163.com/api/cloud/pub/v2",
+			new[] {new ParameterInfo("songid", ParameterType.Required)},
+			BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
+
+		public static readonly CloudMusicApiProvider CloudUploadToken = new CloudMusicApiProvider("/cloud/upload/token",
+			HttpMethod.Post, "https://music.163.com/weapi/nos/token/alloc",
+			new[] {
+				new ParameterInfo("bucket", ParameterType.Constant, ""),
+				new ParameterInfo("ext", ParameterType.Optional, "mp3"),
+				new ParameterInfo("filename", ParameterType.Custom) {
+					CustomHandler = (r) => Path.GetFileNameWithoutExtension(r["filename"].ToString())
+				},
+				new ParameterInfo("local", ParameterType.Constant, false),
+				new ParameterInfo("nos_product", ParameterType.Constant, 3),
+				new ParameterInfo("type", ParameterType.Constant, "audio"),
+				new ParameterInfo("md5", ParameterType.Required),
+			}, BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
+
+		public static readonly CloudMusicApiProvider CloudUploadCheck = new CloudMusicApiProvider("/cloud/upload/check",
+			HttpMethod.Post, "https://interface.music.163.com/api/cloud/upload/check",
+			new[] {
+				new ParameterInfo("bitrate", ParameterType.Optional, "999000"),
+				new ParameterInfo("ext", ParameterType.Constant, ""),
+				new ParameterInfo("length", ParameterType.Required) {KeyForwarding = "size"},
+				new ParameterInfo("md5", ParameterType.Required),
+				new ParameterInfo("songId", ParameterType.Constant, "0"),
+				new ParameterInfo("version", ParameterType.Constant, 1)
+			}, BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
+
+		public static readonly CloudMusicApiProvider UploadCloudInfo = new CloudMusicApiProvider("/upload/cloud/info",
+			HttpMethod.Post, "https://music.163.com/api/upload/cloud/info/v2",
+			new[] {
+				new ParameterInfo("md5", ParameterType.Required),
+				new ParameterInfo("songid", ParameterType.Required) {KeyForwarding = "songId"},
+				new ParameterInfo("filename", ParameterType.Required),
+				new ParameterInfo("song", ParameterType.Required),
+				new ParameterInfo("album", ParameterType.Optional, "未知专辑"),
+				new ParameterInfo("artist", ParameterType.Optional, "未知艺术家"),
+				new ParameterInfo("bitrate", ParameterType.Required),
+				new ParameterInfo("resourceId", ParameterType.Required)
+			}, BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
+
 
 
 		private static Options BuildOptions(string crypto) {
