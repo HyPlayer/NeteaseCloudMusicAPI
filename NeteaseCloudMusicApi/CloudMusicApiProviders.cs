@@ -511,6 +511,17 @@ namespace NeteaseCloudMusicApi {
 			BuildOptions("weapi"));
 
 		/// <summary>
+		/// 歌手专辑列表
+		/// </summary>
+		public static readonly CloudMusicApiProvider ArtistAlbum = new CloudMusicApiProvider("/artist/album",
+			HttpMethod.Post, q => $"https://music.163.com/weapi/artist/albums/{q["id"]}",
+			new[] {
+				new ParameterInfo("limit", ParameterType.Optional, 30),
+				new ParameterInfo("offset", ParameterType.Optional, 0),
+				new ParameterInfo("total", ParameterType.Constant, "total")
+			}, BuildOptions("weapi"));
+
+		/// <summary>
 		/// 歌手详细信息
 		/// </summary>
 		public static readonly CloudMusicApiProvider ArtistDetail = new CloudMusicApiProvider("/artist/detail",
@@ -535,6 +546,13 @@ namespace NeteaseCloudMusicApi {
 				new ParameterInfo("offset", ParameterType.Optional, 0), //hot,time
 				new ParameterInfo("limit", ParameterType.Optional, 100), //hot,time
 			}, BuildOptions("weapi", new[] {new Cookie("os", "pc")}));
+
+		/// <summary>
+		/// 歌手热门50首歌曲
+		/// </summary>
+		public static readonly CloudMusicApiProvider ArtistTopSong = new CloudMusicApiProvider("/artist/top/song",
+			HttpMethod.Post, "https://music.163.com/api/artist/top/song", new[] { new ParameterInfo("id") },
+			BuildOptions("weapi"));
 
 		/// <summary>
 		/// 歌词
