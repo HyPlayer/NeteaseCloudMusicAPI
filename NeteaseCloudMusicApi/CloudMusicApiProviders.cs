@@ -658,6 +658,14 @@ namespace NeteaseCloudMusicApi {
 			}, BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
 
 
+		/// <summary>
+		/// 歌单公开
+		/// </summary>
+		public static readonly CloudMusicApiProvider PlaylistPrivacy = new CloudMusicApiProvider(
+			"/playlist/privacy", HttpMethod.Post, "https://interface.music.163.com/eapi/playlist/update/privacy",
+			new[] { new ParameterInfo("id"), new ParameterInfo("privacy", ParameterType.Constant, 0) },
+			BuildOptions("eapi",null,null,"/api/playlist/update/privacy"));
+
 
 		private static Options BuildOptions(string crypto) {
 			return BuildOptions(crypto, null);
