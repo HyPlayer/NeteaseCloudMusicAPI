@@ -670,7 +670,7 @@ namespace NeteaseCloudMusicApi {
 		///     删除歌单
 		/// </summary>
 		public static readonly CloudMusicApiProvider PlaylistDelete = new CloudMusicApiProvider("/playlist/delete",
-			HttpMethod.Post, "https://music.163.com/weapi/playlist/delete",
+			HttpMethod.Post, "https://music.163.com/weapi/playlist/remove",
 			new[] { new ParameterInfo("ids") { Transformer = JsonArrayTransformer } },
 			BuildOptions("weapi", new[] { new Cookie("os", "pc") }));
 
