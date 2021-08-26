@@ -666,6 +666,13 @@ namespace NeteaseCloudMusicApi {
 			new[] { new ParameterInfo("id"), new ParameterInfo("privacy", ParameterType.Constant, 0) },
 			BuildOptions("eapi",null,null,"/api/playlist/update/privacy"));
 
+		/// <summary>
+		///     删除歌单
+		/// </summary>
+		public static readonly CloudMusicApiProvider PlaylistDelete = new CloudMusicApiProvider("/playlist/delete",
+			HttpMethod.Post, "https://music.163.com/weapi/playlist/delete",
+			new[] { new ParameterInfo("ids") { Transformer = JsonArrayTransformer } },
+			BuildOptions("weapi", new[] { new Cookie("os", "pc") }));
 
 		private static Options BuildOptions(string crypto) {
 			return BuildOptions(crypto, null);
