@@ -24,7 +24,7 @@ namespace NeteaseCloudMusicApi.Utils {
 			"Mozilla/5.0 (Linux; U; Android 9; zh-cn; Redmi Note 8 Build/PKQ1.190616.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.141 Mobile Safari/537.36 XiaoMi/MiuiBrowser/12.5.22",
 			// Android + qq micromsg
 			"Mozilla/5.0 (Linux; Android 10; YAL-AL00 Build/HUAWEIYAL-AL00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.62 XWEB/2581 MMWEBSDK/200801 Mobile Safari/537.36 MMWEBID/3027 MicroMessenger/7.0.18.1740(0x27001235) Process/toolsmp WeChat/arm64 NetType/WIFI Language/zh_CN ABI/arm64",
-			"Mozilla/5.0 (Linux; U; Android 8.1.0; zh-cn; BKK-AL10 Build/HONORBKK-AL10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.126 MQQBrowser/10.6 Mobile Safari/537.36",		
+			"Mozilla/5.0 (Linux; U; Android 8.1.0; zh-cn; BKK-AL10 Build/HONORBKK-AL10) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.126 MQQBrowser/10.6 Mobile Safari/537.36",
 			// macOS 10.15.6  Firefox / Chrome / Safari
 			"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:80.0) Gecko/20100101 Firefox/80.0",
 			"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.30 Safari/537.36",
@@ -47,7 +47,7 @@ namespace NeteaseCloudMusicApi.Utils {
 			}
 		}
 
-		public static async Task<(bool, JObject)> CreateRequest(string method, string url, Dictionary<string, object> data, Options options, CookieCollection setCookie) {
+		public static async Task<JObject> CreateRequest(string method, string url, Dictionary<string, object> data, Options options, CookieCollection setCookie) {
 			if (method is null)
 				throw new ArgumentNullException(nameof(method));
 			if (url is null)
@@ -125,34 +125,29 @@ namespace NeteaseCloudMusicApi.Utils {
 				response.EnsureSuccessStatusCode();
 				if (response.Headers.TryGetValues("Set-Cookie", out var rawSetCookie))
 					setCookie.Add(QuickHttp.ParseCookies(rawSetCookie));
-				string json;
-				if (options.Crypto == "eapi") {
-					try {
-						json = Encoding.UTF8.GetString(Crypto.Decrypt(await response.Content.ReadAsByteArrayAsync()));
-					}
-					catch {
-						json = await response.Content.ReadAsStringAsync();
-					}
+				bool isEApi = options.Crypto == "eapi";
+				byte[] buffer = await response.Content.ReadAsByteArrayAsync();
+				JObject json;
+				try {
+					if (isEApi && buffer[0] != 0x7B && buffer[1] != 0x22)
+						buffer = Crypto.Decrypt(buffer);
+					// response body前两个字符应该为{"，否则认为是加密的
+					json = JObject.Parse(Encoding.UTF8.GetString(buffer));
 				}
-				else {
-					json = await response.Content.ReadAsStringAsync();
+				catch when (isEApi) {
+					json = JObject.Parse(Encoding.UTF8.GetString(Crypto.Decrypt(buffer)));
 				}
-				var body = JObject.Parse(json);
-				int status = (int?)body["code"] ?? (int)response.StatusCode;
-				var answer = new JObject {
-					["status"] = status,
-					["body"] = body
-				};
-				return (status == 200, answer);
+				if (json["code"] is null) {
+					System.Diagnostics.Debug.Assert(true, "code不应为null");
+					json["code"] = (int)response.StatusCode;
+				}
+				return json;
 			}
 			catch (Exception ex) {
-				return (false, new JObject {
-					["status"] = 502,
-					["body"] = new JObject {
-						["code"] = 502,
-						["msg"] = ex.ToFullString()
-					}
-				});
+				return new JObject {
+					["code"] = 502,
+					["msg"] = ex.ToFullString()
+				};
 			}
 
 			static ulong GetCurrentTotalSeconds() {
