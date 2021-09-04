@@ -371,19 +371,20 @@ namespace NeteaseCloudMusicApi {
 			BuildOptions("weapi"));
 
 		/// <summary>
-		/// 心动模式/智能播放
+		///     心动模式/智能播放
 		/// </summary>
 		public static readonly CloudMusicApiProvider PlaymodeIntelligenceList = new CloudMusicApiProvider(
-			"/playmode/intelligence/list", HttpMethod.Post, "http://music.163.com/weapi/playmode/intelligence/list",
+			"/playmode/intelligence/list", HttpMethod.Post,
+			"https://interface.music.163.com/eapi/playmode/intelligence/list",
 			new[] {
-				new ParameterInfo("songId") {KeyForwarding = "id"},
-				new ParameterInfo("playlistId") {KeyForwarding = "pid"},
+				new ParameterInfo("songId") { KeyForwarding = "id" },
+				new ParameterInfo("playlistId") { KeyForwarding = "pid" },
+				new ParameterInfo("type", ParameterType.Constant, "fromPlayAll"),
 				new ParameterInfo("startMusicId", ParameterType.Custom) {
 					CustomHandler = q => q.TryGetValue("sid", out object sid) ? sid : q["id"]
 				},
-				new ParameterInfo("count", ParameterType.Optional, 1),
-				new ParameterInfo("type", ParameterType.Constant, "fromPlayOne")
-			}, BuildOptions("weapi"));
+				new ParameterInfo("count", ParameterType.Optional, 1)
+			}, BuildOptions("eapi", null, null, "/api/playmode/intelligence/list"));
 
 		/// <summary>
 		/// 所有榜单介绍
