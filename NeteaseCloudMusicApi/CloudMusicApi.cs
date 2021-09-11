@@ -94,7 +94,8 @@ namespace NeteaseCloudMusicApi {
 			else
 				json = await RequestAsync(provider.Method, provider.Url(queries), provider.Data(queries), provider.Options);
 			if (throwIfFailed && !IsSuccess(json))
-				throw new HttpRequestException($"调用 '{provider.Route}' 失败");
+				throw new HttpRequestException($"调用 '{provider.Route}' 失败",
+					new Exception((json?["msg"] ?? "").ToString()));
 			return json;
 		}
 
@@ -104,11 +105,7 @@ namespace NeteaseCloudMusicApi {
 		/// <param name="json">服务器返回的数据</param>
 		/// <returns></returns>
 		public static bool IsSuccess(JObject json) {
-			if (json is null)
-				throw new ArgumentNullException(nameof(json));
-
-			int code = (int)json["code"];
-			return 200 <= code && code <= 299;
+			return !(json is null || (json["code"] ?? "").ToString() == "301");
 		}
 
 		private async Task<JObject> RequestAsync(HttpMethod method, string url, Dictionary<string, object> data, Options options) {
