@@ -623,7 +623,7 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider CloudUploadToken = new CloudMusicApiProvider("/cloud/upload/token",
 			HttpMethod.Post, "https://music.163.com/weapi/nos/token/alloc",
 			new[] {
-				new ParameterInfo("bucket", ParameterType.Constant, ""),
+				new ParameterInfo("bucket", ParameterType.Constant, "jd-musicrep-privatecloud-audio-public"),
 				new ParameterInfo("ext", ParameterType.Optional, "mp3"),
 				new ParameterInfo("filename", ParameterType.Custom) {
 					CustomHandler = (r) => Path.GetFileNameWithoutExtension(r["filename"].ToString())
