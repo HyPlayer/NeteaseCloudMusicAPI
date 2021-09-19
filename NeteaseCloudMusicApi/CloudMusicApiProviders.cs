@@ -35,6 +35,13 @@ namespace NeteaseCloudMusicApi {
 
 
 		/// <summary>
+		///     电台 - 详情
+		/// </summary>
+		public static readonly CloudMusicApiProvider DjDetail = new CloudMusicApiProvider("/dj/detail", HttpMethod.Post,
+			"https://music.163.com/weapi/djradio/get",
+			new[] { new ParameterInfo("id") { KeyForwarding = "rid" } }, BuildOptions("weapi"));
+
+		/// <summary>
 		/// 相关歌单推荐
 		/// </summary>
 		public static readonly CloudMusicApiProvider RelatedPlaylist = new CloudMusicApiProvider("/related/playlist");
