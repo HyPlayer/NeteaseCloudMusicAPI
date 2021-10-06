@@ -16,6 +16,21 @@ namespace NeteaseCloudMusicApi {
 	public static class CloudMusicApiProviders {
 
 		/// <summary>
+		///     云盘歌词
+		/// </summary>
+		public static readonly CloudMusicApiProvider CloudLyric = new CloudMusicApiProvider("/cloud/lyric",
+			HttpMethod.Post,
+			"https://interface.music.163.com/eapi/cloud/lyric/get",
+			new[] {
+				new ParameterInfo("songId") { KeyForwarding = "id" },
+				new ParameterInfo("userId"),
+				new ParameterInfo("lv", ParameterType.Constant, "0"),
+				new ParameterInfo("kv", ParameterType.Constant, "0"),
+				new ParameterInfo("tv", ParameterType.Constant, "0")
+			}, BuildOptions("eapi", new[] { new Cookie("os", "pc") }, null, "/api/cloud/lyric/get"));
+
+
+		/// <summary>
 		/// 私人 FM
 		/// </summary>
 		public static readonly CloudMusicApiProvider PersonalFm = new CloudMusicApiProvider("/personal_fm",
