@@ -116,10 +116,12 @@ namespace NeteaseCloudMusicApi.Utils {
 				using var handler = new HttpClientHandler {
 					AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 					UseCookies = false,
-					UseProxy = options.UseProxy
+					UseProxy = options.UseProxy					
 				};
-				if (options.UseProxy)
+				if (options.UseProxy) { 
 					handler.Proxy = options.Proxy;
+					url = url.Replace("https://","http://");
+				}
 				using var client = new HttpClient(handler);
 				using var response = await client.SendAsync(url, method, headers, data2);
 				response.EnsureSuccessStatusCode();
