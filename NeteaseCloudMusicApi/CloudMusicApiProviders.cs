@@ -462,6 +462,21 @@ namespace NeteaseCloudMusicApi {
 			}, BuildOptions("weapi"));
 
 		/// <summary>
+		/// 专辑动态信息
+		/// </summary>
+		public static readonly CloudMusicApiProvider AlbumDetailDynamic = new CloudMusicApiProvider("/album/detail/dynamic",
+			HttpMethod.Post, "https://music.163.com/api/album/detail/dynamic",
+			new[] {new ParameterInfo("id")}, BuildOptions("weapi"));
+
+		/// <summary>
+		/// 收藏 / 取消收藏专辑
+		/// </summary>
+		public static readonly CloudMusicApiProvider AlbumSubscribe = new CloudMusicApiProvider("/album/subscribe",
+			HttpMethod.Post,
+			q => $"https://music.163.com/api/album/{(q["t"].ToString() == "1" ? "sub" : "unsub")}",
+			new[] {new ParameterInfo("id")}, BuildOptions("weapi"));
+
+		/// <summary>
 		/// 电台 - 节目
 		/// </summary>
 		public static readonly CloudMusicApiProvider DjProgram = new CloudMusicApiProvider("/dj/program",
