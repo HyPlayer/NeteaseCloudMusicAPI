@@ -46,7 +46,7 @@ namespace NeteaseCloudMusicApi {
 				new ParameterInfo("alg", ParameterType.Constant, "itembased"),
 				new ParameterInfo("trackId") {KeyForwarding = "id"}, new ParameterInfo("like"),
 				new ParameterInfo("time", ParameterType.Constant, "3")
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277") }));
 
 
 		/// <summary>
@@ -87,7 +87,7 @@ namespace NeteaseCloudMusicApi {
 					}
 				},
 				new ParameterInfo("rememberLogin", ParameterType.Constant, true),
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc")}, "pc"));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc") }, "pc"));
 
 		/// <summary>
 		/// 音乐是否可用
@@ -106,7 +106,7 @@ namespace NeteaseCloudMusicApi {
 			new CloudMusicApiProvider("/batch", HttpMethod.Post, "http://music.163.com/eapi/batch",
 				Array.Empty<ParameterInfo>(), BuildOptions("eapi", null, null, "/api/batch")) {
 				DataProvider = queries => {
-					var data = new Dictionary<string, object> {["e_r"] = true};
+					var data = new Dictionary<string, object> { ["e_r"] = true };
 					foreach (var query in queries) {
 						if (query.Key.StartsWith("/api/", StringComparison.Ordinal))
 							data.Add(query.Key, query.Value);
@@ -124,7 +124,7 @@ namespace NeteaseCloudMusicApi {
 			new[] {
 				new ParameterInfo("name"), new ParameterInfo("privacy"),
 				new ParameterInfo("type", ParameterType.Optional, "NORMAL"),
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc")}));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc") }));
 
 		/// <summary>
 		/// 垃圾桶
@@ -132,7 +132,7 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider FmTrash = new CloudMusicApiProvider("/fm_trash", HttpMethod.Post,
 			q =>
 				$"https://music.163.com/weapi/radio/trash/add?alg=RT&songId={q["id"]}&time={q.GetValueOrDefault("time", 25)}",
-			new[] {new ParameterInfo("songId") {KeyForwarding = "id"}}, BuildOptions("weapi"));
+			new[] { new ParameterInfo("songId") { KeyForwarding = "id" } }, BuildOptions("weapi"));
 
 		/// <summary>
 		/// 资源点赞( MV,电台,视频)
@@ -147,7 +147,7 @@ namespace NeteaseCloudMusicApi {
 							? q["threadId"]
 							: ResourceTypeTransformer(q["type"]).ToString() + q["id"]
 				}
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc")}));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc") }));
 
 		/// <summary>
 		/// 楼层评论
@@ -176,7 +176,7 @@ namespace NeteaseCloudMusicApi {
 							? q["threadId"]
 							: CommentTypeTransformer(q["type"]).ToString() + q["id"]
 				}
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc")}));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc") }));
 
 		/// <summary>
 		/// 发送/删除评论
@@ -184,7 +184,7 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider Comment = new CloudMusicApiProvider("/comment", HttpMethod.Post,
 			q =>
 				$"https://music.163.com/weapi/resource/comments/{(q["t"].ToString() == "1" ? "add" : (q["t"].ToString() == "0" ? "delete" : "reply"))}",
-			Array.Empty<ParameterInfo>(), BuildOptions("weapi", new[] {new Cookie("os", "pc")})) {
+			Array.Empty<ParameterInfo>(), BuildOptions("weapi", new[] { new Cookie("os", "pc") })) {
 			DataProvider = queries => {
 				var data = new Dictionary<string, object> {
 					["threadId"] = CommentTypeTransformer(queries["type"]).ToString() + queries["id"]
@@ -224,14 +224,14 @@ namespace NeteaseCloudMusicApi {
 					}
 				},
 				new ParameterInfo("rememberLogin", ParameterType.Constant, true)
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc")}, "pc"));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc") }, "pc"));
 
 		/// <summary>
 		/// 签到
 		/// </summary>
 		public static readonly CloudMusicApiProvider DailySignin = new CloudMusicApiProvider("/daily_signin",
 			HttpMethod.Post, "https://music.163.com/weapi/point/dailyTask",
-			new[] {new ParameterInfo("type", ParameterType.Optional, 0)}, BuildOptions("weapi"));
+			new[] { new ParameterInfo("type", ParameterType.Optional, 0) }, BuildOptions("weapi"));
 
 		/// <summary>
 		/// 听歌打卡
@@ -260,7 +260,7 @@ namespace NeteaseCloudMusicApi {
 		/// </summary>
 		public static readonly CloudMusicApiProvider LoginQrCheck = new CloudMusicApiProvider("/login/qr/check",
 			HttpMethod.Post, "https://music.163.com/weapi/login/qrcode/client/login",
-			new[] {new ParameterInfo("key"), new ParameterInfo("type", ParameterType.Constant, 1)},
+			new[] { new ParameterInfo("key"), new ParameterInfo("type", ParameterType.Constant, 1) },
 			BuildOptions("weapi"));
 
 		/// <summary>
@@ -268,7 +268,7 @@ namespace NeteaseCloudMusicApi {
 		/// </summary>
 		public static readonly CloudMusicApiProvider SearchHot = new CloudMusicApiProvider("/search/hot",
 			HttpMethod.Post, "https://music.163.com/weapi/search/hot",
-			new[] {new ParameterInfo("type", ParameterType.Constant, 1111)},
+			new[] { new ParameterInfo("type", ParameterType.Constant, 1111) },
 			BuildOptions("weapi", null, "mobile"));
 
 		/// <summary>
@@ -283,13 +283,13 @@ namespace NeteaseCloudMusicApi {
 					CustomHandler = q =>
 						q["sortType"].ToString() == "3"
 							? (q.GetValueOrDefault("cursor", 0))
-							: ((int.Parse(q["pageNo"].ToString()) - 1) * int.Parse(q["pageSize"].ToString())).ToString()
+							: (q["sortType"].ToString() == "2" ? "normalHot#" : "")+((int.Parse(q["pageNo"].ToString()) - 1) * int.Parse(q["pageSize"].ToString())).ToString()
 				}, //这边三目表达式用了很多,然而int转码可能会报错 毕竟js也会报错
 				new ParameterInfo("pageNo", ParameterType.Optional, 1),
 				new ParameterInfo("pageSize", ParameterType.Optional, 20),
 				new ParameterInfo("showInner", ParameterType.Optional, true),
 				new ParameterInfo("sortType", ParameterType.Optional, 1), //1:按推荐排序,2:按热度排序,3:按时间排序
-			}, BuildOptions("eapi", new[] {new Cookie("os", "pc")}, null, "/api/v2/resource/comments"));
+			}, BuildOptions("eapi", new[] { new Cookie("os", "pc") }, null, "/api/v2/resource/comments"));
 
 		/// <summary>
 		/// 每日推荐歌单
@@ -313,7 +313,7 @@ namespace NeteaseCloudMusicApi {
 			"/mlog/rcmd/feed/list",
 			HttpMethod.Post,
 			"https://interface.music.163.com/eapi/mlog/rcmd/feed/list",
-			new [] {
+			new[] {
 				new ParameterInfo("id",ParameterType.Required),
 				new ParameterInfo("type",ParameterType.Constant,2),
 				new ParameterInfo("rcmdType",ParameterType.Constant,20),
@@ -325,7 +325,7 @@ namespace NeteaseCloudMusicApi {
 						return "";
 					})
 				}
-			},BuildOptions("eapi",null,null,"/api/mlog/rcmd/feed/list")
+			}, BuildOptions("eapi", null, null, "/api/mlog/rcmd/feed/list")
 		);
 
 		/// <summary>
@@ -333,7 +333,7 @@ namespace NeteaseCloudMusicApi {
 		/// </summary>
 		public static readonly CloudMusicApiProvider MvDetail = new CloudMusicApiProvider("/mv/detail", HttpMethod.Post,
 			"https://music.163.com/api/v1/mv/detail",
-			new[] {new ParameterInfo("id") {KeyForwarding = "mvid"}}, BuildOptions("weapi"));
+			new[] { new ParameterInfo("id") { KeyForwarding = "mvid" } }, BuildOptions("weapi"));
 		/// <summary>
 		/// 退出登录
 		/// </summary>
@@ -381,7 +381,7 @@ namespace NeteaseCloudMusicApi {
 				new ParameterInfo("resolution", ParameterType.Optional, "1080") {KeyForwarding = "res"},
 				new ParameterInfo("type", ParameterType.Constant, 1),
 				new ParameterInfo("netstate",ParameterType.Constant,1)
-			}, BuildOptions("eapi",null,null,"/api/mlog/video/url"));
+			}, BuildOptions("eapi", null, null, "/api/mlog/video/url"));
 
 
 		/// <summary>
@@ -389,7 +389,7 @@ namespace NeteaseCloudMusicApi {
 		/// </summary>
 		public static readonly CloudMusicApiProvider MvUrl = new CloudMusicApiProvider("/mv/url", HttpMethod.Post,
 			"https://music.163.com/weapi/song/enhance/play/mv/url",
-			new[] {new ParameterInfo("id"), new ParameterInfo("r", ParameterType.Optional, 1080)},
+			new[] { new ParameterInfo("id"), new ParameterInfo("r", ParameterType.Optional, 1080) },
 			BuildOptions("weapi"));
 
 		/// <summary>
@@ -419,7 +419,7 @@ namespace NeteaseCloudMusicApi {
 		/// </summary>
 		public static readonly CloudMusicApiProvider RecommendSongs = new CloudMusicApiProvider("/recommend/songs",
 			HttpMethod.Post, "https://music.163.com/api/v3/discovery/recommend/songs", Array.Empty<ParameterInfo>(),
-			BuildOptions("weapi", new[] {new Cookie("os", "ios")}));
+			BuildOptions("weapi", new[] { new Cookie("os", "ios") }));
 
 		/// <summary>
 		/// 收藏/取消收藏歌单
@@ -427,14 +427,14 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider PlaylistSubscribe = new CloudMusicApiProvider(
 			"/playlist/subscribe", HttpMethod.Post,
 			q => $"https://music.163.com/weapi/playlist/{(q["t"].ToString() == "1" ? "subscribe" : "unsubscribe")}",
-			new[] {new ParameterInfo("id")}, BuildOptions("weapi"));
+			new[] { new ParameterInfo("id") }, BuildOptions("weapi"));
 
 		/// <summary>
 		/// 更新歌单描述
 		/// </summary>
 		public static readonly CloudMusicApiProvider PlaylistDescUpdate = new CloudMusicApiProvider(
 			"/playlist/desc/update", HttpMethod.Post, "https://interface3.music.163.com/eapi/playlist/desc/update",
-			new[] {new ParameterInfo("id"), new ParameterInfo("desc")},
+			new[] { new ParameterInfo("id"), new ParameterInfo("desc") },
 			BuildOptions("eapi", null, null, "/api/playlist/desc/update"));
 
 		/// <summary>
@@ -466,7 +466,7 @@ namespace NeteaseCloudMusicApi {
 		/// </summary>
 		public static readonly CloudMusicApiProvider AlbumDetailDynamic = new CloudMusicApiProvider("/album/detail/dynamic",
 			HttpMethod.Post, "https://music.163.com/api/album/detail/dynamic",
-			new[] {new ParameterInfo("id")}, BuildOptions("weapi"));
+			new[] { new ParameterInfo("id") }, BuildOptions("weapi"));
 
 		/// <summary>
 		/// 收藏 / 取消收藏专辑
@@ -474,7 +474,7 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider AlbumSubscribe = new CloudMusicApiProvider("/album/subscribe",
 			HttpMethod.Post,
 			q => $"https://music.163.com/api/album/{(q["t"].ToString() == "1" ? "sub" : "unsub")}",
-			new[] {new ParameterInfo("id")}, BuildOptions("weapi"));
+			new[] { new ParameterInfo("id") }, BuildOptions("weapi"));
 
 		/// <summary>
 		/// 电台 - 节目
@@ -509,7 +509,7 @@ namespace NeteaseCloudMusicApi {
 		/// </summary>
 		public static readonly CloudMusicApiProvider UserRecord = new CloudMusicApiProvider("/user/record",
 			HttpMethod.Post, "https://music.163.com/weapi/v1/play/record",
-			new[] {new ParameterInfo("uid"), new ParameterInfo("type", ParameterType.Optional, 0)},
+			new[] { new ParameterInfo("uid"), new ParameterInfo("type", ParameterType.Optional, 0) },
 			BuildOptions("weapi"));
 
 		/// <summary>
@@ -519,14 +519,14 @@ namespace NeteaseCloudMusicApi {
 			HttpMethod.Post,
 			q =>
 				$"https://music.163.com/weapi/search/suggest/{(q.GetValueOrDefault("type", null).ToString() == "mobile" ? "keyword" : "web")}",
-			new[] {new ParameterInfo("s") {KeyForwarding = "keywords"}}, BuildOptions("weapi"));
+			new[] { new ParameterInfo("s") { KeyForwarding = "keywords" } }, BuildOptions("weapi"));
 
 		/// <summary>
 		/// 二维码key 获取
 		/// </summary>
 		public static readonly CloudMusicApiProvider LoginQrKey = new CloudMusicApiProvider("/login/qr/key",
 			HttpMethod.Post, "https://music.163.com/weapi/login/qrcode/unikey",
-			new[] {new ParameterInfo("type", ParameterType.Constant, 1)}, BuildOptions("weapi"));
+			new[] { new ParameterInfo("type", ParameterType.Constant, 1) }, BuildOptions("weapi"));
 
 
 
@@ -545,7 +545,7 @@ namespace NeteaseCloudMusicApi {
 		/// 喜欢音乐列表
 		/// </summary>
 		public static readonly CloudMusicApiProvider Likelist = new CloudMusicApiProvider("/likelist", HttpMethod.Post,
-			"https://music.163.com/weapi/song/like/get", new[] {new ParameterInfo("uid")},
+			"https://music.163.com/weapi/song/like/get", new[] { new ParameterInfo("uid") },
 			BuildOptions("weapi"));
 
 		/// <summary>
@@ -564,7 +564,7 @@ namespace NeteaseCloudMusicApi {
 		/// </summary>
 		public static readonly CloudMusicApiProvider ArtistDetail = new CloudMusicApiProvider("/artist/detail",
 			HttpMethod.Post, q => "https://music.163.com/api/artist/head/info/get",
-			new[] {new ParameterInfo("id")}, BuildOptions("weapi"));
+			new[] { new ParameterInfo("id") }, BuildOptions("weapi"));
 
 		/// <summary>
 		/// 登录状态
@@ -583,7 +583,7 @@ namespace NeteaseCloudMusicApi {
 				new ParameterInfo("order", ParameterType.Optional, "hot"), //hot,time
 				new ParameterInfo("offset", ParameterType.Optional, 0), //hot,time
 				new ParameterInfo("limit", ParameterType.Optional, 100), //hot,time
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc")}));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc") }));
 
 		/// <summary>
 		/// 歌手热门50首歌曲
@@ -601,7 +601,7 @@ namespace NeteaseCloudMusicApi {
 				new ParameterInfo("id"), new ParameterInfo("lv", ParameterType.Constant, "-1"),
 				new ParameterInfo("kv", ParameterType.Constant, "-1"),
 				new ParameterInfo("tv", ParameterType.Constant, "-1")
-			}, BuildOptions("linuxapi", new[] {new Cookie("os", "pc")}));
+			}, BuildOptions("linuxapi", new[] { new Cookie("os", "pc") }));
 
 		/// <summary>
 		/// 获取专辑内容
@@ -654,8 +654,8 @@ namespace NeteaseCloudMusicApi {
 
 		public static readonly CloudMusicApiProvider CloudPub = new CloudMusicApiProvider("/cloud/pub", HttpMethod.Post,
 			"https://interface.music.163.com/api/cloud/pub/v2",
-			new[] {new ParameterInfo("songid", ParameterType.Required)},
-			BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
+			new[] { new ParameterInfo("songid", ParameterType.Required) },
+			BuildOptions("weapi", new[] { new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277") }));
 
 		public static readonly CloudMusicApiProvider CloudUploadToken = new CloudMusicApiProvider("/cloud/upload/token",
 			HttpMethod.Post, "https://music.163.com/weapi/nos/token/alloc",
@@ -669,7 +669,7 @@ namespace NeteaseCloudMusicApi {
 				new ParameterInfo("nos_product", ParameterType.Constant, 3),
 				new ParameterInfo("type", ParameterType.Constant, "audio"),
 				new ParameterInfo("md5", ParameterType.Required),
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277") }));
 
 		public static readonly CloudMusicApiProvider CloudUploadCheck = new CloudMusicApiProvider("/cloud/upload/check",
 			HttpMethod.Post, "https://interface.music.163.com/api/cloud/upload/check",
@@ -680,7 +680,7 @@ namespace NeteaseCloudMusicApi {
 				new ParameterInfo("md5", ParameterType.Required),
 				new ParameterInfo("songId", ParameterType.Constant, "0"),
 				new ParameterInfo("version", ParameterType.Constant, 1)
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277") }));
 
 		public static readonly CloudMusicApiProvider UploadCloudInfo = new CloudMusicApiProvider("/upload/cloud/info",
 			HttpMethod.Post, "https://music.163.com/api/upload/cloud/info/v2",
@@ -693,7 +693,7 @@ namespace NeteaseCloudMusicApi {
 				new ParameterInfo("artist", ParameterType.Optional, "未知艺术家"),
 				new ParameterInfo("bitrate", ParameterType.Required),
 				new ParameterInfo("resourceId", ParameterType.Required)
-			}, BuildOptions("weapi", new[] {new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277")}));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277") }));
 
 
 		/// <summary>
@@ -702,7 +702,7 @@ namespace NeteaseCloudMusicApi {
 		public static readonly CloudMusicApiProvider PlaylistPrivacy = new CloudMusicApiProvider(
 			"/playlist/privacy", HttpMethod.Post, "https://interface.music.163.com/eapi/playlist/update/privacy",
 			new[] { new ParameterInfo("id"), new ParameterInfo("privacy", ParameterType.Constant, 0) },
-			BuildOptions("eapi",null,null,"/api/playlist/update/privacy"));
+			BuildOptions("eapi", null, null, "/api/playlist/update/privacy"));
 
 		/// <summary>
 		///     删除歌单
