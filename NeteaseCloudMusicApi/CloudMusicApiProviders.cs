@@ -596,12 +596,14 @@ namespace NeteaseCloudMusicApi {
 		/// 歌词
 		/// </summary>
 		public static readonly CloudMusicApiProvider Lyric = new CloudMusicApiProvider("/lyric", HttpMethod.Post,
-			"https://music.163.com/api/song/lyric",
+			"https://music.163.com/api/song/lyric?_nmclfl=1",
 			new[] {
-				new ParameterInfo("id"), new ParameterInfo("lv", ParameterType.Constant, "-1"),
+				new ParameterInfo("id"),
+				new ParameterInfo("lv", ParameterType.Constant, "-1"),
 				new ParameterInfo("kv", ParameterType.Constant, "-1"),
+				new ParameterInfo("rv", ParameterType.Constant, "-1"),
 				new ParameterInfo("tv", ParameterType.Constant, "-1")
-			}, BuildOptions("linuxapi", new[] { new Cookie("os", "pc") }));
+			}, BuildOptions("linuxapi", new[] { new Cookie("os", "ios") }));
 
 		/// <summary>
 		/// 获取专辑内容
