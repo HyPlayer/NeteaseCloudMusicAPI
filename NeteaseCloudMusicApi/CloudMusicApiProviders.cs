@@ -640,6 +640,22 @@ namespace NeteaseCloudMusicApi {
 
 
 		/// <summary>
+		/// 获取音乐 url - v1
+		/// </summary>
+		public static readonly CloudMusicApiProvider SongUrlV1 = new CloudMusicApiProvider("/song/url/v1", HttpMethod.Post,
+			"https://interface.music.163.com/eapi/song/enhance/player/url/v1",
+			new[] {
+				new ParameterInfo("ids") { KeyForwarding = "id", Transformer = JsonArrayTransformer },
+				new ParameterInfo("level", ParameterType.Optional, "exhigh"),
+				new ParameterInfo("encodeType",ParameterType.Optional,"flac")
+			},
+			BuildOptions("eapi",
+				new[] {
+					new Cookie("os", "pc")
+				}, null, "/api/song/enhance/player/url/v1"));
+
+
+		/// <summary>
 		/// 获取歌曲详情
 		/// </summary>
 		public static readonly CloudMusicApiProvider SongDetail = new CloudMusicApiProvider("/song/detail",
