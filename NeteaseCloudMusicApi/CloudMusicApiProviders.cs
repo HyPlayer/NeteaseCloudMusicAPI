@@ -68,6 +68,14 @@ namespace NeteaseCloudMusicApi {
 				new ParameterInfo("limit", ParameterType.Optional, 30),
 				new ParameterInfo("offset", ParameterType.Optional, 0)
 			}, BuildOptions("weapi"));
+		/// <summary>
+		/// 删除云盘歌曲
+		/// </summary>
+		public static readonly CloudMusicApiProvider UserCloudDelete = new CloudMusicApiProvider("/user/cloud/del",
+			HttpMethod.Post, "https://music.163.com/weapi/cloud/del",
+			new[] {
+				new ParameterInfo("songIds", ParameterType.Required) {KeyForwarding = "id", Transformer = JsonArrayTransformer},
+			}, BuildOptions("weapi" , new[] { new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277") }));
 
 		/// <summary>
 		/// 邮箱登录
