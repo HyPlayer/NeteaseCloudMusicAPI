@@ -246,7 +246,7 @@ namespace NeteaseCloudMusicApi {
 			"https://music.163.com/weapi/feedback/weblog",
 			new[] {
 				new ParameterInfo("logs", ParameterType.Custom) {
-					CustomHandler = q => JsonConvert.SerializeObject(new Dictionary<string, object>[1] {
+					CustomHandler = q => JsonConvert.SerializeObject(new [1] {
 						new Dictionary<string, object> {
 							["action"] = "play",
 							["json"] = new Dictionary<string, object> {
