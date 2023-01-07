@@ -9,5 +9,6 @@ namespace NeteaseCloudMusicApi.Utils {
 		public string RealIP;
 		public bool UseProxy;
 		public IWebProxy Proxy;
+		public bool UseHttp;
 	}
 }

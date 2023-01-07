@@ -453,14 +453,14 @@ namespace NeteaseCloudMusicApi {
 		/// 云盘 - 搜索
 		/// </summary>
 		public static readonly CloudMusicApiProvider Cloudsearch = new CloudMusicApiProvider("/cloudsearch",
-			HttpMethod.Post, "https://music.163.com/api/cloudsearch/pc",
+			HttpMethod.Post, "https://interface.music.163.com/eapi/cloudsearch/pc",
 			new[] {
 				new ParameterInfo("s") { KeyForwarding = "keywords" },
 				new ParameterInfo("type", ParameterType.Optional, 1),
 				new ParameterInfo("limit", ParameterType.Optional, 30),
 				new ParameterInfo("offset", ParameterType.Optional, 0),
 				new ParameterInfo("total", ParameterType.Constant, true)
-			}, BuildOptions("weapi"));
+			}, BuildOptions("eapi", null, null, "/api/cloudsearch/pc"));
 
 		/// <summary>
 		/// 已收藏专辑列表

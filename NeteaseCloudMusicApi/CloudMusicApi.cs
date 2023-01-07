@@ -38,6 +38,11 @@ namespace NeteaseCloudMusicApi {
 		public IWebProxy Proxy { get; set; }
 
 		/// <summary>
+		/// 是否降级HTTPS为HTTP
+		/// </summary>
+		public bool UseHttp { get; set; }
+
+		/// <summary>
 		/// 构造器
 		/// </summary>
 		public CloudMusicApi() {
@@ -132,7 +137,8 @@ namespace NeteaseCloudMusicApi {
 				Url = options.Url,
 				RealIP = RealIP,
 				UseProxy = UseProxy,
-				Proxy = Proxy
+				Proxy = Proxy,
+				UseHttp = UseHttp
 			};
 			newOptions.Cookie.Add(options.Cookie);
 			newOptions.Cookie.Add(Cookies);

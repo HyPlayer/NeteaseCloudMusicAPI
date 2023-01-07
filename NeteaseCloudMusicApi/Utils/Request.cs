@@ -118,10 +118,11 @@ namespace NeteaseCloudMusicApi.Utils {
 					UseCookies = false,
 					UseProxy = options.UseProxy					
 				};
+
 				if (options.UseProxy) { 
 					handler.Proxy = options.Proxy;
-					url = url.Replace("https://","http://");
 				}
+				if (options.UseHttp) url = url.Replace("https://", "http://");
 				using var client = new HttpClient(handler);
 				using var response = await client.SendAsync(url, method, headers, data2);
 				response.EnsureSuccessStatusCode();
