@@ -617,6 +617,23 @@ namespace NeteaseCloudMusicApi {
 			}, BuildOptions("linuxapi", new[] { new Cookie("os", "ios") }));
 
 		/// <summary>
+		/// 新版歌词
+		/// </summary>
+		public static readonly CloudMusicApiProvider LyricNew = new CloudMusicApiProvider("/lyric/new", HttpMethod.Post,
+			"https://interface3.music.163.com/eapi/song/lyric/v1",
+			new[] {
+				new ParameterInfo("id"),
+				new ParameterInfo("cp", ParameterType.Constant, false),
+				new ParameterInfo("tv", ParameterType.Constant, "0"),
+				new ParameterInfo("lv", ParameterType.Constant, "0"),
+				new ParameterInfo("rv", ParameterType.Constant, "0"),
+				new ParameterInfo("kv", ParameterType.Constant, "0"),
+				new ParameterInfo("yv", ParameterType.Constant, "0"),
+				new ParameterInfo("ytv", ParameterType.Constant, "0"),
+				new ParameterInfo("yrv", ParameterType.Constant, "0"),
+			}, BuildOptions("eapi", null, null, "/api/song/lyric/v1"));
+
+		/// <summary>
 		/// 获取专辑内容
 		/// </summary>
 		public static readonly CloudMusicApiProvider Album = new CloudMusicApiProvider("/album", HttpMethod.Post,
