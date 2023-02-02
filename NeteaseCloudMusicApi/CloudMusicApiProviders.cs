@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using NeteaseCloudMusicApi.Utils;
 using Newtonsoft.Json;
 using static NeteaseCloudMusicApi.CloudMusicApiProvider;
@@ -75,7 +74,7 @@ namespace NeteaseCloudMusicApi {
 			HttpMethod.Post, "https://music.163.com/weapi/cloud/del",
 			new[] {
 				new ParameterInfo("songIds", ParameterType.Required) {KeyForwarding = "id", Transformer = JsonArrayTransformer},
-			}, BuildOptions("weapi" , new[] { new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277") }));
+			}, BuildOptions("weapi", new[] { new Cookie("os", "pc"), new Cookie("appver", "2.7.1.198277") }));
 
 		/// <summary>
 		/// 邮箱登录
