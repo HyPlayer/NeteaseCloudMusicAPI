@@ -47,7 +47,7 @@ namespace NeteaseCloudMusicApi.Utils {
 			}
 		}
 
-		public static async Task<JObject> CreateRequest(string method, string url, Dictionary<string, object> data, Options options, CookieCollection setCookie) {
+		public static async Task<JObject> CreateRequest(string method, string url, Dictionary<string, object> data, Options options, CookieCollection setCookie, HttpClient client) {
 			if (method is null)
 				throw new ArgumentNullException(nameof(method));
 			if (url is null)
@@ -113,17 +113,7 @@ namespace NeteaseCloudMusicApi.Utils {
 			}
 			}
 			try {
-				using var handler = new HttpClientHandler {
-					AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-					UseCookies = false,
-					UseProxy = options.UseProxy
-				};
-
-				if (options.UseProxy) {
-					handler.Proxy = options.Proxy;
-				}
 				if (options.UseHttp) url = url.Replace("https://", "http://");
-				using var client = new HttpClient(handler);
 				using var response = await client.SendAsync(url, method, headers, data2);
 				response.EnsureSuccessStatusCode();
 				if (response.Headers.TryGetValues("Set-Cookie", out var rawSetCookie))

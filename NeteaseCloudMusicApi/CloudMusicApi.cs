@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using NeteaseCloudMusicApi.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Windows.Networking.Sockets;
 
 namespace NeteaseCloudMusicApi {
 	/// <summary>
@@ -30,7 +31,22 @@ namespace NeteaseCloudMusicApi {
 		/// <summary>
 		/// 是否使用代理
 		/// </summary>
-		public bool UseProxy { get; set; }
+		public bool UseProxy {
+			get => _useProxy;
+			set
+			{
+				_useProxy = value;
+				HttpClientHandler.UseProxy = value;
+				if(value == true && Proxy != null)
+				{
+					HttpClient.Dispose();
+					HttpClientHandler.Proxy = Proxy;
+					HttpClient = new HttpClient(HttpClientHandler);
+				}
+			}
+		}
+
+		private bool _useProxy = false;
 
 		/// <summary>
 		/// 代理
@@ -41,13 +57,19 @@ namespace NeteaseCloudMusicApi {
 		/// 是否降级HTTPS为HTTP
 		/// </summary>
 		public bool UseHttp { get; set; }
+		public HttpClientHandler HttpClientHandler { get; set; }
+		public HttpClient HttpClient { get; set; }
 
 		/// <summary>
 		/// 构造器
 		/// </summary>
 		public CloudMusicApi() {
 			Cookies = new CookieCollection();
-			UseProxy = true;
+			HttpClientHandler = new HttpClientHandler {
+				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+				UseCookies = false,
+			};
+			HttpClient = new HttpClient(HttpClientHandler);
 		}
 
 		/// <summary>
@@ -97,7 +119,7 @@ namespace NeteaseCloudMusicApi {
 			else if (provider == CloudMusicApiProviders.RelatedPlaylist)
 				json = await HandleRelatedPlaylistAsync(queries);
 			else
-				json = await RequestAsync(provider.Method, provider.Url(queries), provider.Data(queries), provider.Options);
+				json = await RequestAsync(provider.Method, provider.Url(queries), provider.Data(queries), provider.Options, HttpClient);
 			if (throwIfFailed && !IsSuccess(json))
 				throw new HttpRequestException($"调用 '{provider.Route}' 失败",
 					new Exception((json?["msg"] ?? "").ToString()));
@@ -113,7 +135,7 @@ namespace NeteaseCloudMusicApi {
 			return !(json is null || (json["code"] ?? "").ToString() == "301");
 		}
 
-		private async Task<JObject> RequestAsync(HttpMethod method, string url, Dictionary<string, object> data, Options options) {
+		private async Task<JObject> RequestAsync(HttpMethod method, string url, Dictionary<string, object> data, Options options, HttpClient client) {
 			if (method is null)
 				throw new ArgumentNullException(nameof(method));
 			if (url is null)
@@ -123,7 +145,7 @@ namespace NeteaseCloudMusicApi {
 			if (options is null)
 				throw new ArgumentNullException(nameof(options));
 
-			var json = await Request.CreateRequest(method.Method, url, data, MergeOptions(options), Cookies);
+			var json = await Request.CreateRequest(method.Method, url, data, MergeOptions(options), Cookies, client);
 			if ((int)json["code"] == 301)
 				json["msg"] = "未登录";
 			return json;
@@ -147,7 +169,7 @@ namespace NeteaseCloudMusicApi {
 
 		private async Task<JObject> HandleCheckMusicAsync(Dictionary<string, object> queries) {
 			var provider = CloudMusicApiProviders.CheckMusic;
-			var json = await RequestAsync(provider.Method, provider.Url(queries), provider.Data(queries), provider.Options);
+			var json = await RequestAsync(provider.Method, provider.Url(queries), provider.Data(queries), provider.Options, HttpClient);
 			bool playable = (int)json["code"] == 200 && (int)json["data"][0]["code"] == 200;
 			var result = new JObject {
 				["success"] = playable,
@@ -158,7 +180,7 @@ namespace NeteaseCloudMusicApi {
 
 		private async Task<JObject> HandleLoginAsync(Dictionary<string, object> queries) {
 			var provider = CloudMusicApiProviders.Login;
-			var json = await RequestAsync(provider.Method, provider.Url(queries), provider.Data(queries), provider.Options);
+			var json = await RequestAsync(provider.Method, provider.Url(queries), provider.Data(queries), provider.Options, HttpClient);
 			if ((int)json["code"] == 502) {
 				json = new JObject {
 					["msg"] = "账号或密码错误",
