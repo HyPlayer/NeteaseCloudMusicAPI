@@ -21,7 +21,7 @@ namespace NeteaseCloudMusicApi {
 		/// <summary>
 		/// Cookies
 		/// </summary>
-		public CookieCollection Cookies { get; }
+		public CookieCollection Cookies { get; private set; }
 
 		/// <summary>
 		/// 请求头中的 X-Real-IP，如果为 <see langword="null"/> 则不设置
@@ -31,22 +31,7 @@ namespace NeteaseCloudMusicApi {
 		/// <summary>
 		/// 是否使用代理
 		/// </summary>
-		public bool UseProxy {
-			get => _useProxy;
-			set
-			{
-				_useProxy = value;
-				HttpClientHandler.UseProxy = value;
-				if(value == true && Proxy != null)
-				{
-					HttpClient.Dispose();
-					HttpClientHandler.Proxy = Proxy;
-					HttpClient = new HttpClient(HttpClientHandler);
-				}
-			}
-		}
-
-		private bool _useProxy = false;
+		public bool UseProxy { get; } = false;
 
 		/// <summary>
 		/// 代理
@@ -57,8 +42,8 @@ namespace NeteaseCloudMusicApi {
 		/// 是否降级HTTPS为HTTP
 		/// </summary>
 		public bool UseHttp { get; set; }
-		public HttpClientHandler HttpClientHandler { get; set; }
-		public HttpClient HttpClient { get; set; }
+		public HttpClientHandler HttpClientHandler { get;}
+		public HttpClient HttpClient { get;}
 
 		/// <summary>
 		/// 构造器
@@ -68,6 +53,7 @@ namespace NeteaseCloudMusicApi {
 			HttpClientHandler = new HttpClientHandler {
 				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 				UseCookies = false,
+				UseProxy = false
 			};
 			HttpClient = new HttpClient(HttpClientHandler);
 		}
@@ -75,27 +61,39 @@ namespace NeteaseCloudMusicApi {
 		/// <summary>
 		/// 构造器
 		/// </summary>
-		/// <param name="cookies"></param>
-		public CloudMusicApi(CookieCollection cookies) {
-			if (cookies is null)
-				throw new ArgumentNullException(nameof(cookies));
-
-			Cookies = new CookieCollection { cookies };
+		/// <param name="useProxy"></param>
+		/// <param name="proxy"></param>
+		public CloudMusicApi(bool useProxy, IWebProxy proxy) {
+			Cookies = new CookieCollection();
+			HttpClientHandler = new HttpClientHandler {
+				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+				UseCookies = false,
+				UseProxy = useProxy,
+				Proxy = proxy
+			};
+			UseProxy = useProxy;
+			Proxy = proxy;
+			HttpClient = new HttpClient(HttpClientHandler);
 		}
 
 		/// <summary>
 		/// 构造器
 		/// </summary>
-		/// <param name="cookies"></param>
-		public CloudMusicApi(IEnumerable<Cookie> cookies) {
-			if (cookies is null)
-				throw new ArgumentNullException(nameof(cookies));
-
+		/// <param name="useProxy"></param>
+		public CloudMusicApi(bool useProxy) {
 			Cookies = new CookieCollection();
-			foreach (var cookie in cookies)
-				Cookies.Add(cookie);
+			HttpClientHandler = new HttpClientHandler {
+				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+				UseCookies = false,
+				UseProxy = useProxy
+			};
+			UseProxy = useProxy;
+			HttpClient = new HttpClient(HttpClientHandler);
 		}
-
+		public void ClearCookies()
+		{
+			Cookies = new CookieCollection();
+		}
 		/// <summary>
 		/// API请求
 		/// </summary>
