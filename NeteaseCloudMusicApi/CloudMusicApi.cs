@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using NeteaseCloudMusicApi.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Windows.Networking.Sockets;
 
 namespace NeteaseCloudMusicApi {
 	/// <summary>
@@ -42,8 +41,8 @@ namespace NeteaseCloudMusicApi {
 		/// 是否降级HTTPS为HTTP
 		/// </summary>
 		public bool UseHttp { get; set; }
-		public HttpClientHandler HttpClientHandler { get;}
-		public HttpClient HttpClient { get;}
+		public HttpClientHandler HttpClientHandler { get; }
+		public HttpClient HttpClient { get; }
 
 		/// <summary>
 		/// 构造器
@@ -90,8 +89,7 @@ namespace NeteaseCloudMusicApi {
 			UseProxy = useProxy;
 			HttpClient = new HttpClient(HttpClientHandler);
 		}
-		public void ClearCookies()
-		{
+		public void ClearCookies() {
 			Cookies = new CookieCollection();
 		}
 		/// <summary>
