@@ -674,11 +674,13 @@ namespace NeteaseCloudMusicApi {
 			new[] {
 				new ParameterInfo("ids") { KeyForwarding = "id", Transformer = JsonArrayTransformer },
 				new ParameterInfo("level", ParameterType.Optional, "exhigh"),
-				new ParameterInfo("encodeType",ParameterType.Optional,"flac")
+				new ParameterInfo("encodeType",ParameterType.Constant,"flac"),
+				new ParameterInfo("immerseType", ParameterType.Constant, "c51"),
 			},
 			BuildOptions("eapi",
 				new[] {
-					new Cookie("os", "pc")
+					new Cookie("os", "android"),
+					new Cookie("appver", "8.10.05")
 				}, null, "/api/song/enhance/player/url/v1"));
 
 
