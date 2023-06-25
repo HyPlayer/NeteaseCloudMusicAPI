@@ -752,6 +752,14 @@ namespace NeteaseCloudMusicApi {
 			BuildOptions("eapi", null, null, "/api/playlist/update/privacy"));
 
 		/// <summary>
+		/// 音乐百科
+		/// </summary>
+		public static readonly CloudMusicApiProvider SongWikiSummary = new CloudMusicApiProvider(
+			"/song/wiki/summary", HttpMethod.Post, "https://interface3.music.163.com/eapi/music/wiki/home/song/get",
+			new[] { new ParameterInfo("songId"){KeyForwarding = "id"}},
+			BuildOptions("eapi", null, null, "/api/song/play/about/block/page"));
+
+		/// <summary>
 		///     删除歌单
 		/// </summary>
 		public static readonly CloudMusicApiProvider PlaylistDelete = new CloudMusicApiProvider("/playlist/delete",
