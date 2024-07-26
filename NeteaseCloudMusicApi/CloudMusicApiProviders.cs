@@ -312,7 +312,10 @@ namespace NeteaseCloudMusicApi {
 																								  ["wifi"] =
 																									  0,
 																								  ["source"] =
-																									  "list"
+																									  "list",
+																								  ["mainsite"] =
+																									  1,
+																								  ["content"] = ""
 																							  }
 																					  }
 																				  })
