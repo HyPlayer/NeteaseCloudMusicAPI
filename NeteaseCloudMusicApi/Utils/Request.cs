@@ -57,7 +57,11 @@ namespace NeteaseCloudMusicApi.Utils {
 			if (options is null)
 				throw new ArgumentNullException(nameof(options));
 
-			var cookie = options.Cookie.Cast<Cookie>().ToDictionary(t=>t.Name, t=>t.Value);
+			var cookie = new Dictionary<string, string>();
+			var cookieList = options.Cookie.Cast<Cookie>();
+			foreach (var item in cookieList) {
+				cookie[item.Name] = item.Value;
+			}
 			cookie.MergeDictionary(additionalParameters?.Cookies);
 			var headers = new Dictionary<string, string> {
 				["User-Agent"] = ChooseUserAgent(options.UA),
