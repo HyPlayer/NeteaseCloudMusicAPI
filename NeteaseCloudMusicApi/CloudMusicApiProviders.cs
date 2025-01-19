@@ -693,8 +693,8 @@ namespace NeteaseCloudMusicApi {
 		/// 登录状态
 		/// </summary>
 		public static readonly CloudMusicApiProvider LoginStatus = new CloudMusicApiProvider("/login/status",
-			HttpMethod.Post, "https://music.163.com/weapi/w/nuser/account/get", [],
-			BuildOptions("weapi"));
+			HttpMethod.Post, "https://interface.music.163.com/eapi/w/nuser/account/get", [],
+			BuildOptions("eapi", [], null, "/api/w/nuser/account/get"));
 
 		/// <summary>
 		/// 获取歌手歌曲
