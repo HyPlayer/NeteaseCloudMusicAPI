@@ -145,7 +145,7 @@ namespace NeteaseCloudMusicApi.Utils {
 			else
 				throw new ArgumentException(nameof(publicKey));
 
-			int modulusLength = BitConverter.ToInt32(new byte[] { low, high, 0x00, 0x00 }, 0);
+			int modulusLength = BitConverter.ToInt32([low, high, 0x00, 0x00], 0);
 			if (reader.PeekChar() == 0x00) {
 				reader.ReadByte();
 				modulusLength -= 1;

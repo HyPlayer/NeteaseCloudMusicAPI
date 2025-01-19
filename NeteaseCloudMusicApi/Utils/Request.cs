@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace NeteaseCloudMusicApi.Utils {
 	internal static class Request {
-		private static readonly string[] userAgentList = new string[] {
+		private static readonly string[] userAgentList = [
 			// iOS 13.5.1 14.0 beta with safari
 			"Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1",
 			"Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.",
@@ -33,7 +33,7 @@ namespace NeteaseCloudMusicApi.Utils {
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0",
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.30 Safari/537.36",
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/13.10586"
-		};
+		];
 
 		public static string ChooseUserAgent(string ua) {
 			var random = new Random();
@@ -47,7 +47,7 @@ namespace NeteaseCloudMusicApi.Utils {
 			}
 		}
 
-		public static async Task<JObject> CreateRequest(string method, string url, Dictionary<string, object> data, Options options, CookieCollection setCookie, HttpClient client) {
+		public static async Task<JObject> CreateRequest(string method, string url, Dictionary<string, object> data, Options options, CookieCollection setCookie, HttpClient client, AdditionalParameters? additionalParameters = null) {
 			if (method is null)
 				throw new ArgumentNullException(nameof(method));
 			if (url is null)
@@ -57,25 +57,28 @@ namespace NeteaseCloudMusicApi.Utils {
 			if (options is null)
 				throw new ArgumentNullException(nameof(options));
 
+			var cookie = options.Cookie.Cast<Cookie>().ToDictionary(t=>t.Name, t=>t.Value);
+			cookie.MergeDictionary(additionalParameters?.Cookies);
 			var headers = new Dictionary<string, string> {
 				["User-Agent"] = ChooseUserAgent(options.UA),
-				["Cookie"] = string.Join("; ", options.Cookie.Cast<Cookie>().Select(t => t.Name + "=" + t.Value))
+				["Cookie"] = string.Join("; ", cookie.Select(t => t.Key + "=" + t.Value))
 			};
 			if (method.ToUpperInvariant() == "POST")
 				headers["Content-Type"] = "application/x-www-form-urlencoded";
 			if (url.Contains("music.163.com"))
 				headers["Referer"] = "https://music.163.com";
-			if (!(options.RealIP is null))
+			if (options.RealIP is not null)
 				headers["X-Real-IP"] = options.RealIP;
-			var data2 = default(Dictionary<string, string>);
+			Dictionary<string, string> data2 = [];
 			switch (options.Crypto) {
 			case "weapi": {
-				data["csrf_token"] = options.Cookie.Get("__csrf", string.Empty);
+				data["csrf_token"] = cookie.GetValueOrDefault("__csrf", string.Empty);
 				data2 = Crypto.WEApi(data);
 				url = Regex.Replace(url, @"\w*api", "weapi");
 				break;
 			}
 			case "linuxapi": {
+				data.MergeDictionary(additionalParameters?.DataTokens);
 				data2 = Crypto.LinuxApi(new Dictionary<string, object> {
 					["method"] = method,
 					["url"] = Regex.Replace(url, @"\w*api", "api"),
@@ -86,25 +89,27 @@ namespace NeteaseCloudMusicApi.Utils {
 				break;
 			}
 			case "eapi": {
-				var cookie = options.Cookie;
-				string csrfToken = cookie.Get("__csrf", string.Empty);
+				string csrfToken = cookie.GetValueOrDefault("__csrf", string.Empty);
 				var header = new Dictionary<string, string>() {
-					["osver"] = cookie.Get("osver", string.Empty), // 系统版本
-					["deviceId"] = cookie.Get("deviceId", string.Empty), // encrypt.base64.encode(imei + '\t02:00:00:00:00:00\t5106025eb79a5247\t70ffbaac7')
-					["appver"] = cookie.Get("appver", "8.0.0"), // app版本
-					["versioncode"] = cookie.Get("versioncode", "140"), // 版本号
-					["mobilename"] = cookie.Get("mobilename", string.Empty), // 设备model
-					["buildver"] = cookie.Get("buildver", GetCurrentTotalSeconds().ToString()),
-					["resolution"] = cookie.Get("resolution", "1920x1080"), // 设备分辨率
+					["osver"] = cookie.GetValueOrDefault("osver", string.Empty), // 系统版本
+					["deviceId"] = cookie.GetValueOrDefault("deviceId", string.Empty), // encrypt.base64.encode(imei + '\t02:00:00:00:00:00\t5106025eb79a5247\t70ffbaac7')
+					["appver"] = cookie.GetValueOrDefault("appver", "8.0.0"), // app版本
+					["versioncode"] = cookie.GetValueOrDefault("versioncode", "140"), // 版本号
+					["mobilename"] = cookie.GetValueOrDefault("mobilename", string.Empty), // 设备model
+					["buildver"] = cookie.GetValueOrDefault("buildver", GetCurrentTotalSeconds().ToString()),
+					["resolution"] = cookie.GetValueOrDefault("resolution", "1920x1080"), // 设备分辨率
 					["__csrf"] = csrfToken,
-					["os"] = cookie.Get("os", "android"),
-					["channel"] = cookie.Get("channel", string.Empty),
+					["os"] = cookie.GetValueOrDefault("os", "android"),
+					["channel"] = cookie.GetValueOrDefault("channel", string.Empty),
 					["requestId"] = $"{GetCurrentTotalMilliseconds()}_{Math.Floor(new Random().NextDouble() * 1000).ToString().PadLeft(4, '0')}"
 				};
-				if (!(cookie["MUSIC_U"] is null))
-					header["MUSIC_U"] = cookie["MUSIC_U"].Value;
-				if (!(cookie["MUSIC_A"] is null))
-					header["MUSIC_A"] = cookie["MUSIC_A"].Value;
+				if (cookie.TryGetValue("MUSIC_U", out string? music_u))
+					header["MUSIC_U"] = music_u;
+				if (cookie.TryGetValue("MUSIC_A", out string? music_a))
+					header["MUSIC_A"] = music_a;
+
+				header.MergeDictionary(additionalParameters?.EApiHeaders);
+
 				headers["Cookie"] = string.Join("; ", header.Select(t => t.Key + "=" + t.Value));
 				data["header"] = JsonConvert.SerializeObject(header);
 				data2 = Crypto.EApi(options.Url, data);
@@ -114,6 +119,7 @@ namespace NeteaseCloudMusicApi.Utils {
 			}
 			try {
 				if (options.UseHttp) url = url.Replace("https://", "http://");
+				headers.MergeDictionary(additionalParameters?.Headers);
 				using var response = await client.SendAsync(url, method, headers, data2);
 				response.EnsureSuccessStatusCode();
 				if (response.Headers.TryGetValues("Set-Cookie", out var rawSetCookie))

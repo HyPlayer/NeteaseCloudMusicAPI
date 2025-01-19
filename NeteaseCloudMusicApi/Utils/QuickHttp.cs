@@ -162,23 +162,26 @@ namespace NeteaseCloudMusicApi.Utils {
 				public Action<HttpRequestMessage, object> Convert;
 			}
 
-			private static readonly List<HeaderConverter> Converters = new List<HeaderConverter> {
+			private static readonly List<HeaderConverter> Converters = [
 				new HeaderConverter {
 					Type = typeof(string),
 					TypeString = "string",
 					Convert = (request, headers) => Convert(request, (string)headers)
 				},
+
 				new HeaderConverter {
 					Type = typeof(IEnumerable<KeyValuePair<string, string>>),
 					TypeString = "IEnumerable<KeyValuePair<string, string>>",
 					Convert = (request, headers) => Convert(request, (IEnumerable<KeyValuePair<string, string>>)headers)
 				},
+
 				new HeaderConverter {
-					Type = typeof( IEnumerable<KeyValuePair<string, IEnumerable<string>>>),
+					Type = typeof(IEnumerable<KeyValuePair<string, IEnumerable<string>>>),
 					TypeString = " IEnumerable<KeyValuePair<string, IEnumerable<string>>>",
-					Convert = (request, headers) => Convert(request, ( IEnumerable<KeyValuePair<string, IEnumerable<string>>>)headers)
+					Convert = (request, headers) =>
+						Convert(request, (IEnumerable<KeyValuePair<string, IEnumerable<string>>>)headers)
 				}
-			};
+			];
 			public static readonly string SupportedTypesString = string.Join(", ", Converters.Select(t => t.TypeString));
 			//private static readonly HashSet<string> GeneralHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
 			//	"Cache-Control", "Connection", "Date", "Pragma", "Trailer", "Transfer-Encoding", "Upgrade", "Via", "Warning"
@@ -265,33 +268,37 @@ namespace NeteaseCloudMusicApi.Utils {
 				public Action<HttpRequestMessage, object> Convert;
 			}
 
-			private static readonly List<ContentConverter> Converters = new List<ContentConverter> {
+			private static readonly List<ContentConverter> Converters = [
 				new ContentConverter {
 					Type = typeof(HttpContent),
 					TypeString = "HttpContent",
 					Convert = (request, content) => Convert(request, (HttpContent)content)
 				},
+
 				new ContentConverter {
 					Type = typeof(string),
 					TypeString = "string",
 					Convert = (request, content) => Convert(request, (string)content)
 				},
+
 				new ContentConverter {
 					Type = typeof(IEnumerable<KeyValuePair<string, string>>),
 					TypeString = "IEnumerable<KeyValuePair<string, string>>",
 					Convert = (request, content) => Convert(request, (IEnumerable<KeyValuePair<string, string>>)content)
 				},
+
 				new ContentConverter {
 					Type = typeof(byte[]),
 					TypeString = "byte[]",
 					Convert = (request, content) => Convert(request, (byte[])content)
 				},
+
 				new ContentConverter {
 					Type = typeof(Stream),
 					TypeString = "Stream",
 					Convert = (request, content) => Convert(request, (Stream)content)
 				}
-			};
+			];
 			public static readonly string SupportedTypesString = string.Join(", ", Converters.Select(t => t.TypeString));
 
 			public static bool TryConvert(HttpRequestMessage request, object content) {
